@@ -31,8 +31,9 @@ TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
   clic; no replica el descobriment automàtic de Scratch Link.
 - **Només micro:bit.** WeDo 2.0 / Boost / EV3 no estan implementats en esta
   extensió (els cobrix el daemon, excepte EV3 que hi és experimental).
-- **Pocs blocs.** No hi ha temperatura/llum (el firmware de Scratch no els envia)
-  ni WeDo 2.0 / Boost / SPIKE. El protocol de micro:bit està complet.
+- **Pocs blocs.** No hi ha temperatura/llum (el firmware de Scratch no els envia).
+  WeDo 2.0 / Boost / SPIKE no es fan (LEGO els ha descatalogats i no hi ha
+  maquinari per a provar-los); el protocol de micro:bit està complet.
 
 ## Blocs
 

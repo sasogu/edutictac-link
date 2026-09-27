@@ -76,7 +76,8 @@ A Chrome a Linux, Web Bluetooth sol estar **desactivat per defecte**:
 - `mostra el text [...]` (màx. 19 caràcters), `mostra la matriu [25 bits]`, `netja la pantalla`
 
 **Encara no hi ha** temperatura ni llum (el firmware de Scratch no envia eixos
-valors) ni suport per a WeDo/Boost/SPIKE. Vegeu `docs/roadmap.md`.
+valors). WeDo/Boost/SPIKE no està previst (LEGO els ha descatalogats i no hi ha
+maquinari per a provar-los). Vegeu `docs/roadmap.md`.
 
 ## Solució de problemes
 

@@ -73,8 +73,11 @@
   [docs/microbit-web-bluetooth.md](microbit-web-bluetooth.md).
 - **Fet (0.2.2)**: blocs d'esdeveniments («quan es prem el botó», «quan
   s'inclina», «quan s'ha mogut/sacsejat/saltat»), amb detecció de flanc.
-- **Pendent**: temperatura/llum (el firmware de Scratch no els envia); WeDo 2.0 /
-  Boost / SPIKE per Web Bluetooth; Web Serial (micro:bit USB; EV3 per SPP).
+- **Descartat per ara**: WeDo 2.0 / Boost / SPIKE a l'extensió (LEGO els ha
+  descatalogats i no hi ha maquinari per a provar-los). El daemon ja els suporta
+  per BLE si algun dia cal.
+- **Pendent opcional**: Web Serial (micro:bit USB; EV3 per SPP) i
+  temperatura/llum (el firmware de Scratch no els envia).
 - Només Chromium; no substitueix el daemon.
 
 ### Fase 5 — Més dispositius
