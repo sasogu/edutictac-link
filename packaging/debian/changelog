@@ -1,3 +1,11 @@
+edutictac-link (0.1.1) unstable; urgency=medium
+
+  * Nova orde 'scan' per a llistar perifèrics BLE propers.
+  * Documentació de contribució (CONTRIBUTING.md).
+  * Documentada la instal·lació pel repositori APT d'EduTicTac.
+
+ -- EduTicTac <info@edutictac.es>  Sun, 27 Sep 2026 14:00:00 +0200
+
 edutictac-link (0.1.0) unstable; urgency=medium
 
   * Versió inicial.
