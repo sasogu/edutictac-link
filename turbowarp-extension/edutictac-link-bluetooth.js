@@ -203,15 +203,28 @@
       const service = await server.getPrimaryService(MICROBIT_SERVICE);
       const rx = await service.getCharacteristic(RX_CHARACTERISTIC);
       const tx = await service.getCharacteristic(TX_CHARACTERISTIC);
-      rx.addEventListener('characteristicvaluechanged', event => {
-        this._onData(event.target.value);
-      });
-      await rx.startNotifications();
-      device.addEventListener('gattserverdisconnected', () => this._handleDisconnected());
       this._device = device;
       this._server = server;
       this._rx = rx;
       this._tx = tx;
+      console.info(
+        '[EduTicTac Link] connectat; TX props:',
+        Array.from(tx.properties || []),
+        'RX props:',
+        Array.from(rx.properties || [])
+      );
+      rx.addEventListener('characteristicvaluechanged', event => {
+        this._onData(event.target.value);
+      });
+      device.addEventListener('gattserverdisconnected', () => this._handleDisconnected());
+      try {
+        await rx.startNotifications();
+        console.info('[EduTicTac Link] notificacions activades');
+      } catch (err) {
+        console.warn("[EduTicTac Link] no s'han pogut activar les notificacions:", err);
+      }
+      // El firmware de Scratch necessita un moment abans d'acceptar ordes.
+      await new Promise(resolve => setTimeout(resolve, 300));
       this._armTimeout();
     }
 
@@ -274,14 +287,29 @@
     // -- intern ----------------------------------------------------------
 
     _write(bytes) {
-      if (!this._tx) {
+      const tx = this._tx;
+      if (!tx) {
         throw new Error('No hi ha cap micro:bit connectat');
       }
-      // Scratch usa escriptura amb resposta (write request).
-      if (typeof this._tx.writeValueWithResponse === 'function') {
-        return this._tx.writeValueWithResponse(bytes);
-      }
-      return this._tx.writeValue(bytes);
+      const attempt = () => {
+        if (typeof tx.writeValueWithResponse === 'function') {
+          return tx.writeValueWithResponse(bytes);
+        }
+        return tx.writeValue(bytes);
+      };
+      const fallback = () => {
+        if (typeof tx.writeValueWithoutResponse === 'function') {
+          return tx.writeValueWithoutResponse(bytes);
+        }
+        return tx.writeValue(bytes);
+      };
+      return attempt().catch(err => {
+        console.warn(
+          "[EduTicTac Link] escriptura amb resposta fallida; prove sense resposta",
+          err
+        );
+        return fallback();
+      });
     }
 
     _onData(value) {

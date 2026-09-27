@@ -1,3 +1,12 @@
+edutictac-link (0.2.1) unstable; urgency=medium
+
+  * Extensió micro:bit (Web Bluetooth): escriptura robusta (amb resposta i,
+    si falla, sense resposta), assignació de la característica TX abans
+    d'activar les notificacions i espera de 300 ms després de connectar.
+    Provat amb micro:bit V1 real a blocs.edutictac.es.
+
+ -- EduTicTac <info@edutictac.es>  Sun, 27 Sep 2026 23:00:00 +0200
+
 edutictac-link (0.2.0) unstable; urgency=medium
 
   * Extensió experimental de TurboWarp/Blocs amb Web Bluetooth per a
