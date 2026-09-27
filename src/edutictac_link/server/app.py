@@ -1,0 +1,115 @@
+"""Servidor WebSocket compatible amb Scratch Link."""
+
+from __future__ import annotations
+
+import logging
+from typing import Any, Callable
+
+from edutictac_link.bluetooth.backend import BleBackend
+from edutictac_link.bluetooth.bleak_backend import BleakBackend
+from edutictac_link.config import Config
+from edutictac_link.protocol.session import Session, Transport, TransportClosed
+from edutictac_link.server.origin import origin_is_allowed
+
+_LOGGER = logging.getLogger("edutictac_link.server")
+
+BLE_PATH = "/scratch/ble"
+BT_PATH = "/scratch/bt"
+
+
+class WsTransport(Transport):
+    """Adaptador d'un WebSocket de ``websockets`` a la interfície Transport."""
+
+    def __init__(self, websocket: Any) -> None:
+        self._ws = websocket
+
+    async def recv(self) -> str | bytes:
+        try:
+            return await self._ws.recv()
+        except Exception as exc:
+            raise TransportClosed() from exc
+
+    async def send(self, message: str) -> None:
+        await self._ws.send(message)
+
+    async def close(self) -> None:
+        await self._ws.close()
+
+
+class LinkServer:
+    """Servidor que publica els punts d'accés /scratch/ble i /scratch/bt."""
+
+    def __init__(
+        self,
+        config: Config | None = None,
+        backend_factory: Callable[[], BleBackend] | None = None,
+    ) -> None:
+        self.config = config or Config.from_env()
+        self._backend_factory = backend_factory or BleakBackend
+        self._log = _LOGGER
+
+    async def handler(self, websocket: Any) -> None:
+        path = self._path(websocket)
+        if path not in (BLE_PATH, BT_PATH):
+            self._log.warning("Ruta desconeguda: %r", path)
+            await websocket.close(code=1008, reason="Ruta desconeguda")
+            return
+        if path == BT_PATH:
+            self._log.info("Bluetooth Classic encara no està suportat")
+            await websocket.close(
+                code=1011, reason="Bluetooth Classic encara no està suportat"
+            )
+            return
+
+        origin = self._origin(websocket)
+        if not origin_is_allowed(origin, self.config):
+            self._log.warning("Origen rebutjat: %r", origin)
+            await websocket.close(code=1008, reason="Origen no permés")
+            return
+
+        self._log.info("Sessió BLE nova (origen=%s)", origin or "natiu")
+        backend = self._backend_factory()
+        session = Session(
+            WsTransport(websocket),
+            backend,
+            scan_seconds=self.config.scan_seconds,
+            logger=self._log,
+        )
+        try:
+            await session.run()
+        except Exception:  # pragma: no cover - defensiu
+            self._log.debug("La sessió ha acabat amb error", exc_info=True)
+
+    async def serve(self) -> None:
+        import websockets
+
+        async with websockets.serve(
+            self.handler, self.config.host, self.config.port
+        ) as server:
+            self._log.info(
+                "EduTicTac Link escoltant en ws://%s:%d%s",
+                self.config.host,
+                self.config.port,
+                BLE_PATH,
+            )
+            await server.serve_forever()
+
+    @staticmethod
+    def _path(websocket: Any) -> str | None:
+        request = getattr(websocket, "request", None)
+        if request is not None and getattr(request, "path", None):
+            return request.path
+        return getattr(websocket, "path", None)
+
+    @staticmethod
+    def _origin(websocket: Any) -> str | None:
+        request = getattr(websocket, "request", None)
+        headers = getattr(request, "headers", None)
+        if headers is None:
+            headers = getattr(websocket, "request_headers", None)
+        if headers is None:
+            return None
+        try:
+            return headers.get("Origin")
+        except Exception:  # pragma: no cover - defensiu
+            return None

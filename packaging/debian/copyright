@@ -1,0 +1,23 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: edutictac-link
+Source: https://git.edutictac.es/Edutictac/edutictac-link
+
+Files: *
+Copyright: 2026 EduTicTac <info@edutictac.es>
+License: AGPL-3.0-or-later
+ Este programa és programari lliure; el pots redistribuir i/o modificar
+ sota els termes de la GNU Affero General Public License, versió 3 o
+ posterior.
+ .
+ A Debian, el text complet de la llicència es troba a
+ /usr/share/common-licenses/AGPL-3.
+
+Files: debian/*
+Copyright: 2026 EduTicTac <info@edutictac.es>
+License: AGPL-3.0-or-later
+
+Comment:
+ L'arquitectura i part de la lògica de sessió i de coincidència de filtres
+ estan adaptades de pyscrlink (https://github.com/kawasaki/pyscrlink),
+ de Shin'ichiro Kawasaki, sota llicència BSD-3-Clause. El text complet
+ d'eixa llicència es conserva a LICENSE.pyscrlink.

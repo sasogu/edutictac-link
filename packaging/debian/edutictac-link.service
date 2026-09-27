@@ -1,0 +1,14 @@
+[Unit]
+Description=EduTicTac Link (alternativa lliure a Scratch Link)
+Documentation=https://git.edutictac.es/Edutictac/edutictac-link
+After=bluetooth.target
+Wants=bluetooth.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/edutictac-link run
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

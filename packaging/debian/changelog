@@ -1,0 +1,8 @@
+edutictac-link (0.1.0) unstable; urgency=medium
+
+  * Versió inicial.
+  * Servidor WebSocket compatible amb Scratch Link (BLE).
+  * Perfils micro:bit, LEGO WeDo 2.0 i LEGO Boost.
+  * Ordes status, devices i doctor.
+
+ -- EduTicTac <info@edutictac.es>  Sun, 27 Sep 2026 12:00:00 +0200

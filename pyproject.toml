@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edutictac-link"
+version = "0.1.0"
+description = "Alternativa lliure a Scratch Link per a Linux (Debian/LliureX)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "EduTicTac", email = "info@edutictac.es" }]
+keywords = [
+    "scratch", "turbowarp", "bluetooth", "ble", "microbit",
+    "lego", "wedo", "boost", "education", "linux", "lliurex",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Education",
+]
+dependencies = [
+    "bleak>=0.22",
+    "websockets>=12",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[project.scripts]
+edutictac-link = "edutictac_link.cli.main:main"
+
+[project.urls]
+Homepage = "https://edutictac.es"
+Source = "https://git.edutictac.es/Edutictac/edutictac-link"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+edutictac_link = ["py.typed"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]

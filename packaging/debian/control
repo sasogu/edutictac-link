@@ -1,0 +1,31 @@
+Source: edutictac-link
+Section: education
+Priority: optional
+Maintainer: EduTicTac <info@edutictac.es>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-python,
+ pybuild-plugin-pyproject,
+ python3-all,
+ python3-setuptools,
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://edutictac.es
+Vcs-Git: https://git.edutictac.es/Edutictac/edutictac-link.git
+
+Package: edutictac-link
+Architecture: all
+Depends:
+ ${python3:Depends},
+ ${misc:Depends},
+ python3-bleak (>= 0.22),
+ python3-websockets (>= 12),
+ python3-click (>= 8.1),
+Description: Alternativa lliure a Scratch Link per a Linux
+ EduTicTac Link connecta Scratch 3 i TurboWarp amb maquinari educatiu
+ (micro:bit, LEGO WeDo 2.0, LEGO Boost) des de Linux, sense dependre de
+ Scratch Link de Windows/macOS.
+ .
+ Publica un servidor WebSocket local compatible amb el protocol de
+ Scratch Link (JSON-RPC 2.0 sobre ws://127.0.0.1:20111/scratch/ble) i
+ inclou les ordes 'status', 'devices' i 'doctor'.

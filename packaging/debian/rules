@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --buildsystem=pybuild
+
+# EduTicTac Link només s'instal·la com a servei d'USUARI. Evitem que
+# dh_installsystemd genere una unitat de sistema a partir del fitxer
+# debian/edutictac-link.service; la unitat d'usuari s'instal·la via
+# debian/install.
+override_dh_installsystemd:
+	@true
