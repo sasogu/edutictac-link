@@ -31,6 +31,8 @@ TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
   clic; no replica el descobriment automàtic de Scratch Link.
 - **Només micro:bit.** WeDo 2.0 / Boost / EV3 no estan implementats en esta
   extensió (els cobrix el daemon, excepte EV3 que hi és experimental).
+- **Pocs blocs.** No hi ha blocs «quan...» (esdeveniments) ni temperatura/llum.
+  És una limitació coneguda; vegeu `docs/roadmap.md`.
 
 ## Blocs
 
@@ -41,16 +43,19 @@ TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
 
 `inclinació X/Y` es dona en graus (dividit per 10, com Scratch).
 
-## Carregar-la
+## Procediment complet
 
-1. A **TurboWarp**:
-   - Serveix el fitxer en `localhost:8000`:
-     ```bash
-     python3 -m http.server 8000
-     ```
-     i carrega `http://localhost:8000/turbowarp-extension/edutictac-link-bluetooth.js`
-     amb `?extension=...`, o
-   - carrega'l des d'un fitxer amb la casella **«Executa l'extensió sense sandbox»**.
+El pas a pas (gravar el firmware de Scratch, activar Web Bluetooth a Chrome,
+carregar l'extensió i connectar) està documentat a
+[`docs/microbit-web-bluetooth.md`](../docs/microbit-web-bluetooth.md). Ací
+resumix només el desenvolupament.
+
+## Carregar-la a TurboWarp
+
+- Serveix el fitxer en `localhost:8000` (`python3 -m http.server 8000`) i
+  carrega `http://localhost:8000/turbowarp-extension/edutictac-link-bluetooth.js`
+  amb `?extension=...`, o
+- carrega'l des d'un fitxer amb la casella **«Executa l'extensió sense sandbox»**.
 
 ## Integració amb EduTicTac Blocs
 

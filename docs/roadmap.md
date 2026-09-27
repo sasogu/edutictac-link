@@ -63,14 +63,17 @@
 - ~~Publicar a `packages.edutictac.es`~~ **Fet (2026-09-27)**.
 - Integració opcional a l'instal·lador d'EduTicTac Commons.
 
-### Fase 4 — Extensió TurboWarp (complementària) — micro:bit fet
+### Fase 4 — Extensió TurboWarp (complementària) — micro:bit fet i provat
 
 - **Fet (0.2.0)**: extensió unsandboxed amb Web Bluetooth per a **micro:bit**
   (`turbowarp-extension/`), amb protocol testejat amb Node (7 tests).
-- Integració a EduTicTac Blocs documentada (la galeria local `extensions/` ja és
-  de confiança; només cal vendorejar el fitxer i carregar-lo amb `?extension=`).
-- **Pendent**: WeDo 2.0 / Boost / SPIKE per Web Bluetooth, Web Serial
-  (micro:bit USB; EV3 per SPP) i provar-ho en un navegador real.
+- Integració a EduTicTac Blocs feta (vendoritzada a la galeria local
+  `extensions/`; s'executa unsandboxed) i **provada amb maquinari real (V1) a
+  `blocs.edutictac.es`** (0.2.1). Procediment:
+  [docs/microbit-web-bluetooth.md](microbit-web-bluetooth.md).
+- **Pendent**: blocs «quan...» (esdeveniments: botó, sacseig...) i
+  temperatura/llum; WeDo 2.0 / Boost / SPIKE per Web Bluetooth; Web Serial
+  (micro:bit USB; EV3 per SPP).
 - Només Chromium; no substitueix el daemon.
 
 ### Fase 5 — Més dispositius

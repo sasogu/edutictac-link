@@ -101,6 +101,8 @@ variables d'entorn `EDUTICTAC_LINK_*` (vegeu [docs/architecture.md](docs/archite
 - Més detalls a [docs/installation-debian.md](docs/installation-debian.md),
   [docs/security.md](docs/security.md) i la guia de validació amb maquinari
   [docs/validation.md](docs/validation.md).
+- micro:bit sense instal·lar res (extensió de Blocs, Web Bluetooth):
+  [docs/microbit-web-bluetooth.md](docs/microbit-web-bluetooth.md).
 
 ## Desenvolupament
 
