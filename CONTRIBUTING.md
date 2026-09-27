@@ -45,6 +45,7 @@ Bluetooth: fan servir un backend BLE fals (`bluetooth/fake_backend.py`).
 
 - Validació amb maquinari real (micro:bit amb firmware de Scratch, WeDo 2.0,
   Boost) i reportar resultats.
-- Bluetooth Classic / LEGO EV3 (`docs/roadmap.md`, fase 2).
+- **EV3 / Bluetooth Classic**: el transport real és experimental; ajudar a
+  validar-lo amb un EV3 i refinar l'emparellament i el canal SPP.
 - Extensió experimental de TurboWarp (`turbowarp-extension/`).
 - Noms simbòlics de servei Bluetooth (taula de números assignats).

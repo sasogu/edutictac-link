@@ -44,10 +44,15 @@ d'identificació, diagnòstic i fixtures de test. Vegeu
 |---|---|
 | `config.py` | Configuració i lectura de variables d'entorn |
 | `protocol/jsonrpc.py` | Construcció i anàlisi de missatges JSON-RPC 2.0 |
-| `protocol/session.py` | Màquina d'estats d'una connexió (discover/connect/…) |
+| `protocol/base_session.py` | Base comuna del protocol (bucle, estats, JSON-RPC) |
+| `protocol/session.py` | Màquina d'estats d'una connexió BLE (discover/connect/…) |
+| `protocol/bt_session.py` | Sessió Bluetooth Classic (`send`/`didReceiveMessage`) |
 | `bluetooth/backend.py` | Interfície abstracció `BleBackend`/`BleConnection` |
 | `bluetooth/bleak_backend.py` | Implementació real amb `bleak` |
 | `bluetooth/fake_backend.py` | Implementació falsa per a tests |
+| `bluetooth/bt_backend.py` | Interfície `BtBackend`/`BtConnection` (Bluetooth Classic) |
+| `bluetooth/bt_bluez.py` | Implementació real experimental (RFCOMM/SPP) |
+| `bluetooth/fake_bt_backend.py` | Backend Bluetooth Classic fals per a tests |
 | `bluetooth/filters.py` | Resolució d'UUID i coincidència de filtres |
 | `bluetooth/models.py` | `Peripheral` i `Advertisement` |
 | `devices/` | Perfils micro:bit, WeDo 2.0, Boost |
@@ -69,6 +74,9 @@ d'identificació, diagnòstic i fixtures de test. Vegeu
 5. `read`/`write`/`startNotifications`/`stopNotifications` es tradueixen a
    operacions GATT. Les notificacions es reenvien com
    `characteristicDidChange`.
+6. El punt d'accés `/scratch/bt` (Bluetooth Classic) reutilitza la mateixa
+   base amb `BtSession`: `discover` per classe, `connect` amb PIN, `send` i
+   la notificació `didReceiveMessage`.
 
 ## Concurrència
 

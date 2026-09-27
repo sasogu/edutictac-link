@@ -11,7 +11,7 @@ Scratch Foundation a `scratchfoundation/scratch-link` (carpeta
   (UTF-8).
 - Dos punts d'accés:
   - `/scratch/ble` — Bluetooth Low Energy (implementat)
-  - `/scratch/bt` — Bluetooth Classic (reservat; de moment es tanca la sessió)
+  - `/scratch/bt` — Bluetooth Classic (implementat; vegeu la secció final)
 - Una connexió = un perifèric. Per a dos perifèrics calen dos WebSockets.
 
 ## Connexió des del navegador
@@ -126,6 +126,39 @@ Resposta d'error estàndard:
 Codis emprats: `-32600` petició invàlida, `-32601` mètode desconegut,
 `-32602` paràmetres invàlids, `-32000` error de dispositiu (per exemple,
 servei no permés pel descobriment o error de connexió).
+
+## Bluetooth Classic (`/scratch/bt`)
+
+Màquina d'estats idèntica (initial → discovery → connected), però amb mètodes
+propis:
+
+### `discover`
+
+Paràmetres: `majorDeviceClass` i `minorDeviceClass` (classe de dispositiu
+Bluetooth). Per a l'EV3: `8` i `1`. El daemon descobrix, filtra per classe i
+emet `didDiscoverPeripheral`.
+
+### `connect`
+
+Paràmetres: `peripheralId` i, opcionalment, `pin` (PIN d'emparellament; l'EV3
+fa servir `1234`).
+
+### `send`
+
+Paràmetres: `message`, `encoding` (com en BLE). Resposta: nombre de bytes
+enviats.
+
+### `didReceiveMessage`
+
+Notificació del daemon cap al client quan arriben dades:
+
+```json
+{"jsonrpc":"2.0","method":"didReceiveMessage",
+ "params":{"message":"cGluZw==","encoding":"base64"}}
+```
+
+**Estat:** implementat i provat amb un backend fals; el transport real
+(RFCOMM/BlueZ) és experimental i pendent de validació amb maquinari.
 
 ## Seguretat del protocol
 

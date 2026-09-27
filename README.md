@@ -36,7 +36,7 @@ dispositiu que tingues a mà.
 | BBC micro:bit (amb firmware de Scratch) | BLE | Implementat |
 | LEGO WeDo 2.0 | BLE | Implementat |
 | LEGO Boost | BLE | Implementat |
-| LEGO EV3 | Bluetooth Classic | Pendent (fase 2) |
+| LEGO EV3 | Bluetooth Classic | Implementat (experimental) |
 | LEGO SPIKE Prime | — | Sense extensió a Scratch |
 | Vernier Go Direct | BLE | Teòric (perfil estàndard) |
 

@@ -37,14 +37,16 @@ servir de fixtures.
 - Servei: `d91714ef-28b9-4f91-ba16-f0d9a604f112`
 - No és objectiu del primer cicle, però el nucli genèric ja el pot descobrir.
 
-## Bluetooth Classic (pendent, fase 2)
+## Bluetooth Classic (implementat, experimental)
 
 ### LEGO EV3
 
-- Transport: `/scratch/bt` (RFCOMM/SPP)
-- Filtre: `majorDeviceClass 8`, `minorDeviceClass 1`; PIN `1234`
-- Requereix implementar el transport Bluetooth Classic (socket RFCOMM natiu o
-  D-Bus), sense `pybluez`.
+- Transport: `/scratch/bt` (RFCOMM/SPP), backend `bluetooth/bt_bluez.py`.
+- Descobriment per classe: `majorDeviceClass 8`, `minorDeviceClass 1`.
+- Connexió RFCOMM amb el mòdul `socket` estàndard (sense root, sense
+  `pybluez`); PIN d'emparellament `1234`.
+- **Pendent de validació amb un EV3 real.** Es recomana tindre el dispositiu
+  emparellat al sistema una vegada.
 
 ## Altres
 

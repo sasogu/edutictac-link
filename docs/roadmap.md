@@ -19,8 +19,9 @@
 
 ### Què no funciona encara
 
-- **Bluetooth Classic (EV3)**: el punt d'accés `/scratch/bt` es tanca amb un
-  avís. Cal implementar RFCOMM/SPP.
+- **Bluetooth Classic (EV3)**: implementat i provat amb un backend fals; el
+  transport real (RFCOMM/BlueZ) és **experimental i pendent de validació amb
+  un EV3**.
 - **WSS llegat (:20110)**: no s'ofereix; el socket modern és suficient.
 - **Extensió de TurboWarp**: només esquisit i documentació.
 
@@ -49,11 +50,13 @@
 
 ## Fases següents
 
-### Fase 2 — Bluetooth Classic (EV3)
+### Fase 2 — Bluetooth Classic (EV3) — implementada (experimental)
 
-- Transport RFCOMM amb `socket.AF_BLUETOOTH` o D-Bus (`org.bluez`).
-- Descobriment per classe de dispositiu i emparellament amb PIN.
-- Tests amb un backend fals de socket.
+- Transport RFCOMM amb `socket.AF_BLUETOOTH` + descobriment amb `bluetoothctl`.
+- Descobriment per classe de dispositiu i `connect` amb PIN.
+- Tests amb un backend fals (`FakeBtBackend`).
+- **Pendent:** validar amb un EV3 real i, si cal, refinar l'emparellament i la
+  detecció del canal SPP.
 
 ### Fase 3 — Empaquetat i distribució
 

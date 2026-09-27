@@ -7,7 +7,10 @@ from typing import Any, Callable
 
 from edutictac_link.bluetooth.backend import BleBackend
 from edutictac_link.bluetooth.bleak_backend import BleakBackend
+from edutictac_link.bluetooth.bt_backend import BtBackend
+from edutictac_link.bluetooth.bt_bluez import BluezBtBackend
 from edutictac_link.config import Config
+from edutictac_link.protocol.bt_session import BtSession
 from edutictac_link.protocol.session import Session, Transport, TransportClosed
 from edutictac_link.server.origin import origin_is_allowed
 
@@ -43,9 +46,11 @@ class LinkServer:
         self,
         config: Config | None = None,
         backend_factory: Callable[[], BleBackend] | None = None,
+        bt_backend_factory: Callable[[], BtBackend] | None = None,
     ) -> None:
         self.config = config or Config.from_env()
         self._backend_factory = backend_factory or BleakBackend
+        self._bt_backend_factory = bt_backend_factory or BluezBtBackend
         self._log = _LOGGER
 
     async def handler(self, websocket: Any) -> None:
@@ -54,12 +59,6 @@ class LinkServer:
             self._log.warning("Ruta desconeguda: %r", path)
             await websocket.close(code=1008, reason="Ruta desconeguda")
             return
-        if path == BT_PATH:
-            self._log.info("Bluetooth Classic encara no està suportat")
-            await websocket.close(
-                code=1011, reason="Bluetooth Classic encara no està suportat"
-            )
-            return
 
         origin = self._origin(websocket)
         if not origin_is_allowed(origin, self.config):
@@ -67,15 +66,25 @@ class LinkServer:
             await websocket.close(code=1008, reason="Origen no permés")
             return
 
-        self._log.info("Sessió BLE nova (origen=%s)", origin or "natiu")
-        backend = self._backend_factory()
-        session = Session(
-            WsTransport(websocket),
-            backend,
-            scan_seconds=self.config.scan_seconds,
-            operation_timeout=self.config.operation_timeout,
-            logger=self._log,
-        )
+        kind = "BT" if path == BT_PATH else "BLE"
+        self._log.info("Sessió %s nova (origen=%s)", kind, origin or "natiu")
+        transport = WsTransport(websocket)
+        if path == BT_PATH:
+            session: Session | BtSession = BtSession(
+                transport,
+                self._bt_backend_factory(),
+                scan_seconds=self.config.scan_seconds,
+                operation_timeout=self.config.operation_timeout,
+                logger=self._log,
+            )
+        else:
+            session = Session(
+                transport,
+                self._backend_factory(),
+                scan_seconds=self.config.scan_seconds,
+                operation_timeout=self.config.operation_timeout,
+                logger=self._log,
+            )
         try:
             await session.run()
         except Exception:  # pragma: no cover - defensiu

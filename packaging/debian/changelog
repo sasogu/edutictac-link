@@ -1,3 +1,12 @@
+edutictac-link (0.1.3) unstable; urgency=medium
+
+  * Bluetooth Classic (LEGO EV3): punt d'accés /scratch/bt amb discover per
+    classe, connect amb PIN, send i didReceiveMessage.
+  * Backend BlueZ (RFCOMM/SPP) experimental; backend fals per a tests.
+  * Sessió de protocol refactoritzada en base comuna (BaseSession).
+
+ -- EduTicTac <info@edutictac.es>  Sun, 27 Sep 2026 18:00:00 +0200
+
 edutictac-link (0.1.2) unstable; urgency=medium
 
   * Detecció de desconnexió inesperada del perifèric: es tanca el socket

@@ -11,9 +11,10 @@ import websockets
 from websockets.exceptions import ConnectionClosed
 
 from edutictac_link.bluetooth.fake_backend import FakeBackend
+from edutictac_link.bluetooth.fake_bt_backend import FakeBtBackend, FakeBtConnection
 from edutictac_link.config import Config
 from edutictac_link.server import LinkServer
-from tests.conftest import make_microbit
+from tests.conftest import make_microbit, make_peripheral
 
 
 async def _recv_until(
@@ -61,6 +62,44 @@ async def test_server_getversion_discover_and_write():
                 ws, lambda m: m.get("method") == "didDiscoverPeripheral"
             )
             assert note["params"]["name"] == "BBC micro:bit"
+
+
+async def test_server_bt_endpoint():
+    ev3 = make_peripheral(peripheral_id="11:22:33:44:55:66", name="EV3", services=())
+    connection = FakeBtConnection()
+    bt_backend = FakeBtBackend(peripherals=[ev3], connection=connection)
+    config = Config(host="127.0.0.1", port=0, scan_seconds=0.1)
+    server = LinkServer(
+        config,
+        backend_factory=FakeBackend,
+        bt_backend_factory=lambda: bt_backend,
+    )
+
+    async with websockets.serve(server.handler, "127.0.0.1", 0) as ws_server:
+        port = ws_server.sockets[0].getsockname()[1]
+        uri = f"ws://127.0.0.1:{port}/scratch/bt"
+        async with websockets.connect(uri) as ws:
+            await ws.send(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "getVersion"}))
+            response = await _recv_until(ws, lambda m: m.get("id") == 1)
+            assert response["result"]["protocol"] == "1.3"
+
+            await ws.send(
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 2,
+                        "method": "discover",
+                        "params": {"majorDeviceClass": 8, "minorDeviceClass": 1},
+                    }
+                )
+            )
+            response = await _recv_until(ws, lambda m: m.get("id") == 2)
+            assert response["result"] is None
+
+            note = await _recv_until(
+                ws, lambda m: m.get("method") == "didDiscoverPeripheral"
+            )
+            assert note["params"]["name"] == "EV3"
 
 
 async def test_server_rejects_unknown_path():

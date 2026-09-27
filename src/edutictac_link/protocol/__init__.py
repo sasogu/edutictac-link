@@ -1,5 +1,6 @@
-"""Capes de protocol: JSON-RPC 2.0 i màquina d'estats de sessió."""
+"""Capes de protocol: JSON-RPC 2.0 i màquines d'estat de sessió."""
 
+from edutictac_link.protocol.bt_session import BtSession
 from edutictac_link.protocol.errors import JsonRpcError
 from edutictac_link.protocol.jsonrpc import (
     make_error,
@@ -10,6 +11,7 @@ from edutictac_link.protocol.jsonrpc import (
 from edutictac_link.protocol.session import Session, SessionState
 
 __all__ = [
+    "BtSession",
     "JsonRpcError",
     "make_error",
     "make_notification",
