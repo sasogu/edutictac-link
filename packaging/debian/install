@@ -1,1 +1,3 @@
 packaging/debian/edutictac-link.service usr/lib/systemd/user/
+turbowarp-extension/edutictac-link-bluetooth.js usr/share/edutictac-link/turbowarp-extension/
+turbowarp-extension/README.md usr/share/edutictac-link/turbowarp-extension/

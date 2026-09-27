@@ -47,5 +47,7 @@ Bluetooth: fan servir un backend BLE fals (`bluetooth/fake_backend.py`).
   Boost) i reportar resultats.
 - **EV3 / Bluetooth Classic**: el transport real és experimental; ajudar a
   validar-lo amb un EV3 i refinar l'emparellament i el canal SPP.
-- Extensió experimental de TurboWarp (`turbowarp-extension/`).
+- **Extensió de TurboWarp** (`turbowarp-extension/`): micro:bit ja està
+  implementat; ajudar a afegir WeDo 2.0 / Boost / SPIKE (Web Bluetooth) i
+  provar-ho en Chromium real.
 - Noms simbòlics de servei Bluetooth (taula de números assignats).

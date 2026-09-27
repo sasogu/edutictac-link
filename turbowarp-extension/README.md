@@ -1,56 +1,87 @@
-# Extensió experimental de TurboWarp
+# Extensió experimental de TurboWarp / EduTicTac Blocs
 
-**Esbós del primer cicle. No forma part del daemon i no substitueix
-EduTicTac Link.**
+**Esbós avançat. No forma part del daemon i no el substitueix.**
 
-## Què és
-
-Una via complementària per connectar maquinari educatiu directament des de
-TurboWarp, sense daemon local, fent servir **Web Bluetooth** (i en el futur
-**Web Serial**).
+Conecta un **micro:bit** amb Web Bluetooth directament des del navegador,
+sense daemon local.
 
 ```
-TurboWarp ──Web Bluetooth/Web Serial──▶ hardware
+TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
 ```
 
-## Limitacions (importants)
+## Què funciona
 
-- **Només Chromium/Edge.** Web Bluetooth i Web Serial no estan disponibles a
-  Firefox ni Safari. Esta via no substituïx el daemon, que funciona a tots
-  dos.
-- **Ha de ser unsandboxed.** Les extensions carregades per URL només corren
-  sense sandbox des de `https://extensions.turbowarp.org/` o
-  `http://localhost:8000/` exactes. Per a servir-la des de
-  `blocs.edutictac.es` cal modificar la llista blanca en el fork
-  EduTicTac Blocs (que ja té el modal d'extensions personalitzades) o
-  carregar-la des d'un fitxer amb la casella «sense sandbox».
-- **Sense escaneig automàtic.** Web Bluetooth requerix un gest d'usuari i
-  mostra el seu propi selector de dispositius; no replica l'experiència de
-  descobriment de Scratch Link.
-- **Cobertura per protocol:**
-  - micro:bit, WeDo 2.0, Boost, SPIKE Prime → BLE GATT → Web Bluetooth.
-  - EV3 → Bluetooth Classic → **no** per Web Bluetooth; possible per Web
-    Serial si el sistema exposa el port SPP (`/dev/rfcomm0`).
+- micro:bit (amb el firmware de Scratch) via **Web Bluetooth**.
+- Blocs: connectar/desconnectar, inclinació X/Y, botons A/B, pins tàctils 0/1/2,
+  gestos (moure's/sacsejar-se/saltar), mostrar text, mostrar matriu 5×5 i netejar
+  la pantalla.
+- El protocol (encoding de comandes i parseig de notificacions) està en funcions
+  pures, **testejades amb Node** (7 tests).
 
-## Fitxers
+## Límits (importants)
 
-- `edutictac-link-bluetooth.js` — esbós d'extensió unsandboxed amb blocs per
-  comprovar la disponibilitat de Web Bluetooth i connectar amb un micro:bit.
+- **Només Chromium/Edge.** Firefox i Safari no tenen Web Bluetooth. La via del
+  **daemon EduTicTac Link** funciona a tots dos: és la via recomanada.
+- **Ha de córrer sense sandbox.** Les extensions carregades per URL només són
+  unsandboxed des de `https://extensions.turbowarp.org/` o
+  `http://localhost:8000/` exactes. **A EduTicTac Blocs, la galeria local
+  `extensions/` ja és de confiança** (vegeu la integració).
+- **Sense escaneig automàtic.** Web Bluetooth exigix un gest d'usuari i mostra
+  el seu propi selector. Cal executar el bloc «connecta el micro:bit» amb un
+  clic; no replica el descobriment automàtic de Scratch Link.
+- **Només micro:bit.** WeDo 2.0 / Boost / EV3 no estan implementats en esta
+  extensió (els cobrix el daemon, excepte EV3 que hi és experimental).
 
-## Provar-ho
+## Blocs
 
-1. Serveix el fitxer per HTTP en `localhost:8000`:
-   ```bash
-   cd turbowarp-extension
-   python3 -m http.server 8000
-   ```
-2. Obri TurboWarp (o EduTicTac Blocs) amb l'extensió:
-   `http://localhost:8000/edutictac-link-bluetooth.js`.
-3. Comprova el bloc «Web Bluetooth disponible?» i el de connexió.
+- `connecta el micro:bit` · `desconnecta el micro:bit` · `connectat?` · `nom del micro:bit`
+- `inclinació X` · `inclinació Y`
+- `botó [A/B] premut?` · `pin [0/1/2] tocat?` · `[s'ha mogut / s'ha sacsejat / ha saltat]?`
+- `mostra el text [...]` (màx. 19 caràcters) · `mostra la matriu [25 bits]` · `netja la pantalla`
 
-## Estat
+`inclinació X/Y` es dona en graus (dividit per 10, com Scratch).
 
-Experimental. L'objectiu del primer cicle és només documentar la viabilitat i
-deixar un punt de partida. La integració real a EduTicTac Blocs i el suport
-complet de blocs és treball de fases posteriors (vegeu
-`docs/roadmap.md`).
+## Carregar-la
+
+1. A **TurboWarp**:
+   - Serveix el fitxer en `localhost:8000`:
+     ```bash
+     python3 -m http.server 8000
+     ```
+     i carrega `http://localhost:8000/turbowarp-extension/edutictac-link-bluetooth.js`
+     amb `?extension=...`, o
+   - carrega'l des d'un fitxer amb la casella **«Executa l'extensió sense sandbox»**.
+
+## Integració amb EduTicTac Blocs
+
+Blocs substituïx la confiança de TurboWarp per **la seua pròpia galeria local**
+(`extensions/`, vegeu `src/blocs/extensions-policy.js` del repo). Per tant:
+
+1. Copia `edutictac-link-bluetooth.js` a la galeria del fork:
+   `edutictac-blocs/extensions/edutictac-link-bluetooth.js`.
+2. Carrega-la com `https://blocs.edutictac.es/editor?extension=extensions/edutictac-link-bluetooth.js`
+   (o des de la galeria local, si s'hi afig).
+3. Reconstruïx i redesplega Blocs (`docker compose up -d --build`).
+
+No cal tocar el `SecurityManager`: qualsevol URL baix `extensions/` del mateix
+origen ja és de confiança i s'executa sense sandbox.
+
+## Tests
+
+```bash
+cd turbowarp-extension
+node --test
+```
+
+El fitxer de l'extensió és alhora carregable com a `<script>` i com a mòdul
+CommonJS: si detecta `module.exports` i no `Scratch`, exporta les funcions pures
+per als tests.
+
+## Relació amb el daemon
+
+- **Daemon** (`edutictac-link`): Firefox i Chromium, descoberta automàtica,
+  micro:bit/WeDo2/Boost/EV3, sense instal·lar res al navegador.
+- **Esta extensió**: només Chromium, sense instal·lar res al sistema, però amb
+  connexió manual i només micro:bit.
+
+Vegeu `docs/roadmap.md` (Fase 4).
