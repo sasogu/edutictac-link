@@ -35,7 +35,8 @@
 
 1. Provar amb un micro:bit real: gravar el firmware, arrancar el daemon i
    connectar des de TurboWarp amb el navegador.
-2. Publicar el `.deb` a `packages.edutictac.es` (infraestructura existent).
+2. ~~Publicar el `.deb` a `packages.edutictac.es`~~ **Fet (2026-09-27)**:
+   `edutictac-link_0.1.0_all.deb`, signat, a `https://packages.edutictac.es`.
 3. Escriure la documentació de contribució.
 
 ## Fases següents
@@ -48,7 +49,7 @@
 
 ### Fase 3 — Empaquetat i distribució
 
-- Publicar a `packages.edutictac.es` i al repositori d'apt d'EduTicTac.
+- ~~Publicar a `packages.edutictac.es`~~ **Fet (2026-09-27)**.
 - Integració opcional a l'instal·lador d'EduTicTac Commons.
 
 ### Fase 4 — Extensió TurboWarp (complementària)

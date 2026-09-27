@@ -27,19 +27,34 @@ cd edutictac-link
 pipx install .
 ```
 
-## Opció de sistema: paquet .deb
+## Opció de sistema: repositori APT d'EduTicTac
 
-El repositori inclou l'empaquetat Debian:
+El paquet està publicat a `packages.edutictac.es`:
+
+```bash
+curl -fsSL https://packages.edutictac.es/edutictac-archive-keyring.gpg \
+  | sudo tee /usr/share/keyrings/edutictac.gpg >/dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/edutictac.gpg] https://packages.edutictac.es stable main" \
+  | sudo tee /etc/apt/sources.list.d/edutictac.list
+
+sudo apt update
+sudo apt install edutictac-link
+```
+
+El paquet depén de `python3-bleak`, `python3-websockets` i `python3-click`
+(disponibles a Debian 13/trixie). A Debian 12 cal comprovar que les versions
+siguen prou recents.
+
+### Construir el .deb localment
+
+Si preferixes construir-lo tu:
 
 ```bash
 sudo apt install debhelper dh-python pybuild-plugin-pyproject python3-all python3-setuptools
 ./packaging/build-deb.sh
 sudo apt install ./dist/edutictac-link_0.1.0_all.deb
 ```
-
-El paquet depén de `python3-bleak`, `python3-websockets` i `python3-click`
-(disponibles a Debian 13/trixie). A Debian 12 cal comprovar que les versions
-siguen prou recents.
 
 ## Servei d'usuari systemd
 

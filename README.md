@@ -57,6 +57,12 @@ edutictac-link doctor     # comprova Python, BlueZ, adaptador, ports, navegadors
 edutictac-link            # arranca el daemon
 ```
 
+També es pot instal·lar pel repositori APT d'EduTicTac:
+
+```bash
+sudo apt install edutictac-link   # vegeu docs/installation-debian.md
+```
+
 Obrigues Scratch (o TurboWarp) al navegador, afegir l'extensió del dispositiu
 (micro:bit, WeDo 2.0, Boost) i connectar.
 
