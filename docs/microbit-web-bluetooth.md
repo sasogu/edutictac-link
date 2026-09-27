@@ -61,15 +61,22 @@ A Chrome a Linux, Web Bluetooth sol estar **desactivat per defecte**:
 
 ## 5. Blocs disponibles
 
+**Esdeveniments (quan...):**
+- `quan es prem el botó [A/B]`
+- `quan [s'ha mogut / s'ha sacsejat / ha saltat]`
+- `quan s'inclina [cap a qualsevol costat / amunt / avall / a l'esquerra / a la dreta]`
+
+**Connexió i sensors:**
 - `connecta el micro:bit`, `desconnecta el micro:bit`, `connectat?`, `nom del micro:bit`
 - `inclinació X`, `inclinació Y` (en graus, com Scratch)
 - `botó [A/B] premut?`, `pin [0/1/2] tocat?`
 - `[s'ha mogut / s'ha sacsejat / ha saltat]?`
+
+**Pantalla:**
 - `mostra el text [...]` (màx. 19 caràcters), `mostra la matriu [25 bits]`, `netja la pantalla`
 
-**Encara no hi ha** blocs «quan...» (esdeveniments: quan es prem A/B, quan es
-sacseja, etc.) ni temperatura/llum. És una limitació coneguda de l'extensió
-(vegeu `docs/roadmap.md`).
+**Encara no hi ha** temperatura ni llum (el firmware de Scratch no envia eixos
+valors) ni suport per a WeDo/Boost/SPIKE. Vegeu `docs/roadmap.md`.
 
 ## Solució de problemes
 

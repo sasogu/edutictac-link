@@ -66,3 +66,42 @@ test('parseMicrobitData amb tot a zero', () => {
   assert.deepEqual(state.touchPins, [false, false, false]);
   assert.deepEqual(state.gesture, {moved: false, shaken: false, jumped: false});
 });
+
+test('detectTransitions: flanc del botó A', () => {
+  const previous = microbit.parseMicrobitData(new Uint8Array(10));
+  const next = microbit.parseMicrobitData(new Uint8Array([0, 0, 0, 0, 1, 0, 0, 0, 0, 0]));
+  assert.deepEqual(microbit.detectTransitions(previous, next), [
+    {opcode: 'whenButtonPressed', fields: {BUTTON: 'A'}}
+  ]);
+});
+
+test('detectTransitions: sense flanc si ja estava premut', () => {
+  const pressed = microbit.parseMicrobitData(new Uint8Array([0, 0, 0, 0, 1, 0, 0, 0, 0, 0]));
+  assert.deepEqual(microbit.detectTransitions(pressed, pressed), []);
+});
+
+test('detectTransitions: gest sacsejat', () => {
+  const previous = microbit.parseMicrobitData(new Uint8Array(10));
+  const next = microbit.parseMicrobitData(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0b001]));
+  assert.deepEqual(microbit.detectTransitions(previous, next), [
+    {opcode: 'whenGesture', fields: {GESTURE: 'shaken'}}
+  ]);
+});
+
+test('detectTransitions: inclinació a la dreta', () => {
+  const previous = microbit.parseMicrobitData(new Uint8Array(10));
+  const next = microbit.parseMicrobitData(new Uint8Array([0, 200, 0, 0, 0, 0, 0, 0, 0, 0]));
+  const events = microbit.detectTransitions(previous, next);
+  assert.ok(events.some(e => e.opcode === 'whenTilted' && e.fields.DIRECTION === 'right'));
+  assert.ok(events.some(e => e.opcode === 'whenTilted' && e.fields.DIRECTION === 'any'));
+});
+
+test('tiltDirections: cap a l\'esquerra', () => {
+  // data[0]=0xff, data[1]=0x38 => tiltX = -200 => angle -20
+  const state = microbit.parseMicrobitData(new Uint8Array([0xff, 0x38, 0, 0, 0, 0, 0, 0, 0, 0]));
+  const dirs = microbit.tiltDirections(state);
+  assert.equal(dirs.left, true);
+  assert.equal(dirs.right, false);
+  assert.equal(dirs.any, true);
+});
+

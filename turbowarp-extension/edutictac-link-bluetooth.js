@@ -79,6 +79,40 @@
     };
   };
 
+  const tiltDirections = state => {
+    const angleX = Math.round(state.tiltX / 10);
+    const angleY = Math.round(state.tiltY / 10);
+    const threshold = 15;
+    const up = angleY <= -threshold;
+    const down = angleY >= threshold;
+    const left = angleX <= -threshold;
+    const right = angleX >= threshold;
+    return {any: up || down || left || right, up, down, left, right};
+  };
+
+  const detectTransitions = (previous, next) => {
+    const events = [];
+    if (!previous.buttonA && next.buttonA) {
+      events.push({opcode: 'whenButtonPressed', fields: {BUTTON: 'A'}});
+    }
+    if (!previous.buttonB && next.buttonB) {
+      events.push({opcode: 'whenButtonPressed', fields: {BUTTON: 'B'}});
+    }
+    for (const gesture of ['moved', 'shaken', 'jumped']) {
+      if (!previous.gesture[gesture] && next.gesture[gesture]) {
+        events.push({opcode: 'whenGesture', fields: {GESTURE: gesture}});
+      }
+    }
+    const before = tiltDirections(previous);
+    const after = tiltDirections(next);
+    for (const direction of ['any', 'up', 'down', 'left', 'right']) {
+      if (!before[direction] && after[direction]) {
+        events.push({opcode: 'whenTilted', fields: {DIRECTION: direction}});
+      }
+    }
+    return events;
+  };
+
   const exportedApi = {
     CMD_PIN_CONFIG,
     CMD_DISPLAY_TEXT,
@@ -92,7 +126,9 @@
     encodeMatrix,
     encodeClearDisplay,
     toSigned16,
-    parseMicrobitData
+    parseMicrobitData,
+    tiltDirections,
+    detectTransitions
   };
 
   if (typeof module !== 'undefined' && module.exports) {
@@ -122,6 +158,37 @@
         color1: '#0ea5e9',
         color2: '#0284c7',
         blocks: [
+          {
+            opcode: 'whenButtonPressed',
+            blockType: Scratch.BlockType.EVENT,
+            text: 'quan es prem el botó [BUTTON]',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              BUTTON: {type: Scratch.ArgumentType.STRING, menu: 'BUTTONS'}
+            }
+          },
+          {
+            opcode: 'whenGesture',
+            blockType: Scratch.BlockType.EVENT,
+            text: 'quan [GESTURE]',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              GESTURE: {type: Scratch.ArgumentType.STRING, menu: 'GESTURES'}
+            }
+          },
+          {
+            opcode: 'whenTilted',
+            blockType: Scratch.BlockType.EVENT,
+            text: "quan s'inclina [DIRECTION]",
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              DIRECTION: {type: Scratch.ArgumentType.STRING, menu: 'DIRECTIONS'}
+            }
+          },
+          '---',
           {opcode: 'connect', blockType: Scratch.BlockType.COMMAND, text: 'connecta el micro:bit'},
           {opcode: 'disconnect', blockType: Scratch.BlockType.COMMAND, text: 'desconnecta el micro:bit'},
           {opcode: 'isConnected', blockType: Scratch.BlockType.BOOLEAN, text: 'connectat?'},
@@ -184,6 +251,16 @@
               {text: 's\'ha mogut', value: 'moved'},
               {text: 's\'ha sacsejat', value: 'shaken'},
               {text: 'ha saltat', value: 'jumped'}
+            ]
+          },
+          DIRECTIONS: {
+            acceptReporters: false,
+            items: [
+              {text: 'cap a qualsevol costat', value: 'any'},
+              {text: 'cap amunt', value: 'up'},
+              {text: 'cap avall', value: 'down'},
+              {text: 'a l\'esquerra', value: 'left'},
+              {text: 'a la dreta', value: 'right'}
             ]
           }
         }
@@ -316,8 +393,22 @@
       const bytes = new Uint8Array(
         value.buffer, value.byteOffset, value.byteLength
       );
-      this._state = parseMicrobitData(bytes);
+      const previous = this._state;
+      const next = parseMicrobitData(bytes);
+      this._state = next;
       this._armTimeout();
+      this._fireEvents(previous, next);
+    }
+
+    _fireEvents(previous, next) {
+      const runtime =
+        typeof Scratch !== 'undefined' && Scratch.vm && Scratch.vm.runtime;
+      if (!runtime || typeof runtime.startHats !== 'function') {
+        return;
+      }
+      for (const event of detectTransitions(previous, next)) {
+        runtime.startHats(`edutictacLinkMicrobit_${event.opcode}`, event.fields);
+      }
     }
 
     _armTimeout() {

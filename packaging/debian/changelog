@@ -1,3 +1,11 @@
+edutictac-link (0.2.2) unstable; urgency=medium
+
+  * Extensió micro:bit (Web Bluetooth): blocs d'esdeveniments «quan es prem el
+    botó [A/B]», «quan s'ha mogut/sacsejat/saltat» i «quan s'inclina [...]»,
+    amb detecció de flanc. 12 tests Node.
+
+ -- EduTicTac <info@edutictac.es>  Mon, 28 Sep 2026 00:30:00 +0200
+
 edutictac-link (0.2.1) unstable; urgency=medium
 
   * Extensió micro:bit (Web Bluetooth): escriptura robusta (amb resposta i,

@@ -71,9 +71,10 @@
   `extensions/`; s'executa unsandboxed) i **provada amb maquinari real (V1) a
   `blocs.edutictac.es`** (0.2.1). Procediment:
   [docs/microbit-web-bluetooth.md](microbit-web-bluetooth.md).
-- **Pendent**: blocs «quan...» (esdeveniments: botó, sacseig...) i
-  temperatura/llum; WeDo 2.0 / Boost / SPIKE per Web Bluetooth; Web Serial
-  (micro:bit USB; EV3 per SPP).
+- **Fet (0.2.2)**: blocs d'esdeveniments («quan es prem el botó», «quan
+  s'inclina», «quan s'ha mogut/sacsejat/saltat»), amb detecció de flanc.
+- **Pendent**: temperatura/llum (el firmware de Scratch no els envia); WeDo 2.0 /
+  Boost / SPIKE per Web Bluetooth; Web Serial (micro:bit USB; EV3 per SPP).
 - Només Chromium; no substitueix el daemon.
 
 ### Fase 5 — Més dispositius

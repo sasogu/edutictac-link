@@ -31,17 +31,20 @@ TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
   clic; no replica el descobriment automàtic de Scratch Link.
 - **Només micro:bit.** WeDo 2.0 / Boost / EV3 no estan implementats en esta
   extensió (els cobrix el daemon, excepte EV3 que hi és experimental).
-- **Pocs blocs.** No hi ha blocs «quan...» (esdeveniments) ni temperatura/llum.
-  És una limitació coneguda; vegeu `docs/roadmap.md`.
+- **Pocs blocs.** No hi ha temperatura/llum (el firmware de Scratch no els envia)
+  ni WeDo 2.0 / Boost / SPIKE. El protocol de micro:bit està complet.
 
 ## Blocs
 
+- **Esdeveniments**: `quan es prem el botó [A/B]`, `quan [s'ha mogut/sacsejat/saltat]`, `quan s'inclina [any/amunt/avall/esquerra/dreta]`
 - `connecta el micro:bit` · `desconnecta el micro:bit` · `connectat?` · `nom del micro:bit`
 - `inclinació X` · `inclinació Y`
 - `botó [A/B] premut?` · `pin [0/1/2] tocat?` · `[s'ha mogut / s'ha sacsejat / ha saltat]?`
 - `mostra el text [...]` (màx. 19 caràcters) · `mostra la matriu [25 bits]` · `netja la pantalla`
 
-`inclinació X/Y` es dona en graus (dividit per 10, com Scratch).
+`inclinació X/Y` es dona en graus (dividit per 10, com Scratch). Els blocs
+«quan...» detecten el flanc (només s'activen quan la condició passa de falsa a
+certa).
 
 ## Procediment complet
 
