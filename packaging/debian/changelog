@@ -1,3 +1,11 @@
+edutictac-link (0.2.3) unstable; urgency=medium
+
+  * Extensió micro:bit (Web Bluetooth): superconjunt de l'extensió estàndard de
+    Scratch. Afegits «mostra el símbol [9 icones]», «està inclinat [direcció]?»
+    i «quan el pin [0/1/2] es toca». 15 tests Node.
+
+ -- EduTicTac <info@edutictac.es>  Mon, 28 Sep 2026 01:30:00 +0200
+
 edutictac-link (0.2.2) unstable; urgency=medium
 
   * Extensió micro:bit (Web Bluetooth): blocs d'esdeveniments «quan es prem el

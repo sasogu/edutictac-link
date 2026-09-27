@@ -105,3 +105,27 @@ test('tiltDirections: cap a l\'esquerra', () => {
   assert.equal(dirs.any, true);
 });
 
+test('ICON_PATTERNS: totes de 25 caràcters i codificables', () => {
+  const patterns = microbit.ICON_PATTERNS;
+  assert.ok(Object.keys(patterns).length >= 9);
+  for (const [name, pattern] of Object.entries(patterns)) {
+    assert.equal(pattern.length, 25, `icona ${name}`);
+    const encoded = microbit.encodeMatrix(pattern);
+    assert.equal(encoded.length, 6, `icona ${name}`);
+    assert.equal(encoded[0], 0x82);
+  }
+});
+
+test('detectTransitions: flanc del pin', () => {
+  const previous = microbit.parseMicrobitData(new Uint8Array(10));
+  const next = microbit.parseMicrobitData(new Uint8Array([0, 0, 0, 0, 0, 0, 1, 0, 0, 0]));
+  const events = microbit.detectTransitions(previous, next);
+  assert.ok(events.some(e => e.opcode === 'whenPinConnected' && e.fields.PIN === '0'));
+});
+
+test('detectTransitions: sense flanc de pin si ja tocava', () => {
+  const touched = microbit.parseMicrobitData(new Uint8Array([0, 0, 0, 0, 0, 0, 1, 0, 0, 0]));
+  assert.deepEqual(microbit.detectTransitions(touched, touched), []);
+});
+
+

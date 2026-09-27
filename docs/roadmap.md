@@ -73,6 +73,9 @@
   [docs/microbit-web-bluetooth.md](microbit-web-bluetooth.md).
 - **Fet (0.2.2)**: blocs d'esdeveniments («quan es prem el botó», «quan
   s'inclina», «quan s'ha mogut/sacsejat/saltat»), amb detecció de flanc.
+- **Fet (0.2.3)**: superconjunt de l'extensió estàndard de Scratch — afegits
+  `mostra el símbol [...]` (9 icones), `està inclinat [direcció]?` i
+  `quan el pin [0/1/2] es toca`.
 - **Descartat per ara**: WeDo 2.0 / Boost / SPIKE a l'extensió (LEGO els ha
   descatalogats i no hi ha maquinari per a provar-los). El daemon ja els suporta
   per BLE si algun dia cal.

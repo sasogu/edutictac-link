@@ -37,15 +37,15 @@ TurboWarp / Blocs ──Web Bluetooth──▶ micro:bit
 
 ## Blocs
 
-- **Esdeveniments**: `quan es prem el botó [A/B]`, `quan [s'ha mogut/sacsejat/saltat]`, `quan s'inclina [any/amunt/avall/esquerra/dreta]`
+- **Esdeveniments**: `quan es prem el botó [A/B]`, `quan [s'ha mogut/sacsejat/saltat]`, `quan s'inclina [any/amunt/avall/esquerra/dreta]`, `quan el pin [0/1/2] es toca`
 - `connecta el micro:bit` · `desconnecta el micro:bit` · `connectat?` · `nom del micro:bit`
-- `inclinació X` · `inclinació Y`
+- `inclinació X` · `inclinació Y` · `està inclinat [direcció]?`
 - `botó [A/B] premut?` · `pin [0/1/2] tocat?` · `[s'ha mogut / s'ha sacsejat / ha saltat]?`
-- `mostra el text [...]` (màx. 19 caràcters) · `mostra la matriu [25 bits]` · `netja la pantalla`
+- `mostra el símbol [cor/feliç/trist/fletxes/sí/no]` · `mostra el text [...]` (màx. 19 caràcters) · `mostra la matriu [25 bits]` · `netja la pantalla`
 
 `inclinació X/Y` es dona en graus (dividit per 10, com Scratch). Els blocs
 «quan...» detecten el flanc (només s'activen quan la condició passa de falsa a
-certa).
+certa). És un **superconjunt** dels 10 blocs de l'extensió estàndard de Scratch.
 
 ## Procediment complet
 

@@ -57,6 +57,20 @@
 
   const encodeClearDisplay = () => encodeCommand(CMD_DISPLAY_LED, [0, 0, 0, 0, 0]);
 
+  // Icones de 5x5 (25 caràcters '0'/'1', fila a fila; el primer de la fila és
+  // la columna de l'esquerra). Es dibuixen amb la comanda 0x82.
+  const ICON_PATTERNS = {
+    heart: '0101011111111110111000100',
+    happy: '0000010001000001000101110',
+    sad: '0000010001000000111010001',
+    up: '0010001110101010010000100',
+    down: '0010000100101010111000100',
+    left: '0010001000111110100000100',
+    right: '0010000010111110001000100',
+    yes: '0000100010101000100000000',
+    no: '1000101010001000101010001'
+  };
+
   const toSigned16 = (high, low) => {
     const value = low | (high << 8);
     return value > (1 << 15) ? value - (1 << 16) : value;
@@ -103,6 +117,11 @@
         events.push({opcode: 'whenGesture', fields: {GESTURE: gesture}});
       }
     }
+    for (let pin = 0; pin < 3; pin++) {
+      if (!previous.touchPins[pin] && next.touchPins[pin]) {
+        events.push({opcode: 'whenPinConnected', fields: {PIN: String(pin)}});
+      }
+    }
     const before = tiltDirections(previous);
     const after = tiltDirections(next);
     for (const direction of ['any', 'up', 'down', 'left', 'right']) {
@@ -127,6 +146,7 @@
     encodeClearDisplay,
     toSigned16,
     parseMicrobitData,
+    ICON_PATTERNS,
     tiltDirections,
     detectTransitions
   };
@@ -188,6 +208,16 @@
               DIRECTION: {type: Scratch.ArgumentType.STRING, menu: 'DIRECTIONS'}
             }
           },
+          {
+            opcode: 'whenPinConnected',
+            blockType: Scratch.BlockType.EVENT,
+            text: 'quan el pin [PIN] es toca',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              PIN: {type: Scratch.ArgumentType.STRING, menu: 'PINS'}
+            }
+          },
           '---',
           {opcode: 'connect', blockType: Scratch.BlockType.COMMAND, text: 'connecta el micro:bit'},
           {opcode: 'disconnect', blockType: Scratch.BlockType.COMMAND, text: 'desconnecta el micro:bit'},
@@ -220,7 +250,23 @@
               GESTURE: {type: Scratch.ArgumentType.STRING, menu: 'GESTURES', defaultValue: 'shaken'}
             }
           },
+          {
+            opcode: 'isTilted',
+            blockType: Scratch.BlockType.BOOLEAN,
+            text: 'està inclinat [DIRECTION]?',
+            arguments: {
+              DIRECTION: {type: Scratch.ArgumentType.STRING, menu: 'DIRECTIONS', defaultValue: 'any'}
+            }
+          },
           '---',
+          {
+            opcode: 'displaySymbol',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'mostra el símbol [SYMBOL]',
+            arguments: {
+              SYMBOL: {type: Scratch.ArgumentType.STRING, menu: 'SYMBOLS', defaultValue: 'heart'}
+            }
+          },
           {
             opcode: 'displayText',
             blockType: Scratch.BlockType.COMMAND,
@@ -261,6 +307,20 @@
               {text: 'cap avall', value: 'down'},
               {text: 'a l\'esquerra', value: 'left'},
               {text: 'a la dreta', value: 'right'}
+            ]
+          },
+          SYMBOLS: {
+            acceptReporters: false,
+            items: [
+              {text: 'cor', value: 'heart'},
+              {text: 'feliç', value: 'happy'},
+              {text: 'trist', value: 'sad'},
+              {text: 'fletxa amunt', value: 'up'},
+              {text: 'fletxa avall', value: 'down'},
+              {text: 'fletxa esquerra', value: 'left'},
+              {text: 'fletxa dreta', value: 'right'},
+              {text: 'sí', value: 'yes'},
+              {text: 'no', value: 'no'}
             ]
           }
         }
@@ -347,7 +407,16 @@
       return !!this._state.gesture[String(args.GESTURE)];
     }
 
+    isTilted(args) {
+      return !!tiltDirections(this._state)[String(args.DIRECTION)];
+    }
+
     // -- pantalla --------------------------------------------------------
+
+    async displaySymbol(args) {
+      const pattern = ICON_PATTERNS[String(args.SYMBOL)] || ICON_PATTERNS.heart;
+      await this._write(encodeMatrix(pattern));
+    }
 
     async displayText(args) {
       await this._write(encodeDisplayText(args.TEXT));

@@ -65,16 +65,19 @@ A Chrome a Linux, Web Bluetooth sol estar **desactivat per defecte**:
 - `quan es prem el botó [A/B]`
 - `quan [s'ha mogut / s'ha sacsejat / ha saltat]`
 - `quan s'inclina [cap a qualsevol costat / amunt / avall / a l'esquerra / a la dreta]`
+- `quan el pin [0/1/2] es toca`
 
 **Connexió i sensors:**
 - `connecta el micro:bit`, `desconnecta el micro:bit`, `connectat?`, `nom del micro:bit`
-- `inclinació X`, `inclinació Y` (en graus, com Scratch)
+- `inclinació X`, `inclinació Y` (en graus, com Scratch), `està inclinat [direcció]?`
 - `botó [A/B] premut?`, `pin [0/1/2] tocat?`
 - `[s'ha mogut / s'ha sacsejat / ha saltat]?`
 
 **Pantalla:**
+- `mostra el símbol [cor/feliç/trist/fletxes/sí/no]`
 - `mostra el text [...]` (màx. 19 caràcters), `mostra la matriu [25 bits]`, `netja la pantalla`
 
+És un **superconjunt** dels 10 blocs de l'extensió estàndard de Scratch.
 **Encara no hi ha** temperatura ni llum (el firmware de Scratch no envia eixos
 valors). WeDo/Boost/SPIKE no està previst (LEGO els ha descatalogats i no hi ha
 maquinari per a provar-los). Vegeu `docs/roadmap.md`.
