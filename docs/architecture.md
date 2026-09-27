@@ -54,7 +54,7 @@ d'identificació, diagnòstic i fixtures de test. Vegeu
 | `server/app.py` | Servidor WebSocket i adaptació del transport |
 | `server/origin.py` | Validació de la capçalera `Origin` |
 | `doctor.py` | Comprovacions de l'entorn |
-| `cli/main.py` | Ordes `run`, `status`, `devices`, `doctor` |
+| `cli/main.py` | Ordes `run`, `status`, `devices`, `scan`, `doctor` |
 
 ## Flux d'una sessió
 

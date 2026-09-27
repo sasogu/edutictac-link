@@ -80,6 +80,7 @@ edutictac-link                 # arranca el daemon
 edutictac-link run             # el mateix, explícit
 edutictac-link status          # indica si està escoltant
 edutictac-link devices         # llista els dispositius coneguts
+edutictac-link scan            # escaneja perifèrics BLE propers
 edutictac-link doctor          # diagnòstic de l'entorn
 ```
 

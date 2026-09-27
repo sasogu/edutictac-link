@@ -109,6 +109,44 @@ def devices() -> None:
 
 
 @main.command()
+@click.option(
+    "-s",
+    "--seconds",
+    type=float,
+    default=5.0,
+    show_default=True,
+    help="Duració de l'escaneig.",
+)
+def scan(seconds: float) -> None:
+    """Escaneja perifèrics BLE propers (per a diagnòstic del maquinari)."""
+    from edutictac_link.bluetooth.bleak_backend import BleakBackend
+
+    async def _scan():
+        return await BleakBackend().scan(seconds)
+
+    try:
+        peripherals = asyncio.run(_scan())
+    except Exception as exc:
+        raise click.ClickException(f"Error en escanejar BLE: {exc}") from exc
+
+    if not peripherals:
+        click.echo("No s'ha detectat cap perifèric BLE.")
+        return
+
+    profiles = all_profiles()
+    for peripheral in sorted(
+        peripherals, key=lambda item: (item.display_name or "").lower()
+    ):
+        name = peripheral.display_name or "(sense nom)"
+        profile = next(
+            (pr.id for pr in profiles if pr.matches(peripheral)), "-"
+        )
+        click.echo(
+            f"{peripheral.id:<20} {name:<30} rssi={peripheral.rssi} perfil={profile}"
+        )
+
+
+@main.command()
 @click.pass_obj
 def doctor(config: Config) -> None:
     """Comprova l'entorn (Python, BlueZ, adaptador, ports, navegadors)."""
