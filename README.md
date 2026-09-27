@@ -98,8 +98,9 @@ variables d'entorn `EDUTICTAC_LINK_*` (vegeu [docs/architecture.md](docs/archite
   (`scratchfoundation/scratch-microbit-firmware`).
 - **Permisos.** Normalment no cal root. Si `doctor` ho indica, afig el teu
   usuari al grup `bluetooth`.
-- Més detalls a [docs/installation-debian.md](docs/installation-debian.md) i
-  [docs/security.md](docs/security.md).
+- Més detalls a [docs/installation-debian.md](docs/installation-debian.md),
+  [docs/security.md](docs/security.md) i la guia de validació amb maquinari
+  [docs/validation.md](docs/validation.md).
 
 ## Desenvolupament
 

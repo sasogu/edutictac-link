@@ -8,6 +8,7 @@ from collections.abc import Callable
 from edutictac_link.bluetooth.models import Peripheral
 
 NotifyCallback = Callable[[bytes], None]
+DisconnectCallback = Callable[[], None]
 
 
 class BleConnection(ABC):
@@ -50,5 +51,11 @@ class BleBackend(ABC):
         """Escaneja perifèrics durant ``timeout`` segons."""
 
     @abstractmethod
-    async def connect(self, peripheral: Peripheral) -> BleConnection:
-        """Connecta amb un perifèric detectat."""
+    async def connect(
+        self, peripheral: Peripheral, on_disconnect: DisconnectCallback | None = None
+    ) -> BleConnection:
+        """Connecta amb un perifèric detectat.
+
+        Si es proporciona ``on_disconnect``, s'invoca quan la connexió es
+        perd de manera inesperada (bateria, abast, apagada).
+        """

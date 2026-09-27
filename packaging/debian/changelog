@@ -1,3 +1,13 @@
+edutictac-link (0.1.2) unstable; urgency=medium
+
+  * Detecció de desconnexió inesperada del perifèric: es tanca el socket
+    perquè el navegador mostre la pèrdua de connexió.
+  * Temps d'espera configurable en les operacions GATT.
+  * Errors de dispositiu unificats (codi -32000).
+  * Guia de validació amb maquinari (docs/validation.md).
+
+ -- EduTicTac <info@edutictac.es>  Sun, 27 Sep 2026 16:00:00 +0200
+
 edutictac-link (0.1.1) unstable; urgency=medium
 
   * Nova orde 'scan' per a llistar perifèrics BLE propers.

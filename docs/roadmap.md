@@ -34,10 +34,18 @@
 ### Següent pas immediat
 
 1. Provar amb un micro:bit real: gravar el firmware, arrancar el daemon i
-   connectar des de TurboWarp amb el navegador.
+   connectar des de TurboWarp amb el navegador. Guia:
+   [docs/validation.md](validation.md).
 2. ~~Publicar el `.deb` a `packages.edutictac.es`~~ **Fet (2026-09-27)**:
    `edutictac-link_0.1.0_all.deb`, signat, a `https://packages.edutictac.es`.
-3. Escriure la documentació de contribució.
+3. Escriure la documentació de contribució. **Fet**: `CONTRIBUTING.md`.
+
+### Enduriment del nucli (0.1.2)
+
+- Detecció de desconnexió inesperada del perifèric: es tanca el socket perquè
+  el navegador mostre «s'ha perdut la connexió».
+- Temps d'espera a les operacions GATT (`EDUTICTAC_LINK_OPERATION_TIMEOUT`).
+- Errors de dispositiu unificats (codi `-32000`).
 
 ## Fases següents
 

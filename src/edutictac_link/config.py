@@ -67,6 +67,7 @@ class Config:
     allow_missing_origin: bool = True
     scan_seconds: float = 10.0
     discover_timeout: float = 15.0
+    operation_timeout: float = 10.0
     debug: bool = False
 
     @classmethod
@@ -81,5 +82,6 @@ class Config:
             ),
             scan_seconds=_env_float("EDUTICTAC_LINK_SCAN_SECONDS", 10.0),
             discover_timeout=_env_float("EDUTICTAC_LINK_DISCOVER_TIMEOUT", 15.0),
+            operation_timeout=_env_float("EDUTICTAC_LINK_OPERATION_TIMEOUT", 10.0),
             debug=_env_bool("EDUTICTAC_LINK_DEBUG", False),
         )

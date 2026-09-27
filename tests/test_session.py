@@ -17,6 +17,7 @@ class FakeTransport:
     def __init__(self) -> None:
         self.incoming: asyncio.Queue[str | None] = asyncio.Queue()
         self.sent: list[dict[str, Any]] = []
+        self.closed = False
 
     async def recv(self) -> str:
         item = await self.incoming.get()
@@ -27,8 +28,9 @@ class FakeTransport:
     async def send(self, message: str) -> None:
         self.sent.append(json.loads(message))
 
-    async def close(self) -> None:  # pragma: no cover - no s'usa als tests
-        pass
+    async def close(self) -> None:
+        self.closed = True
+        self.incoming.put_nowait(None)
 
     def push(self, obj: dict[str, Any]) -> None:
         self.incoming.put_nowait(json.dumps(obj))
@@ -209,7 +211,7 @@ async def test_discover_requires_filter():
 
 async def test_connect_error_is_reported():
     class FailingBackend(FakeBackend):
-        async def connect(self, peripheral):
+        async def connect(self, peripheral, on_disconnect=None):
             raise RuntimeError("adaptador ocupat")
 
     backend = FailingBackend(peripherals=[make_microbit()])
@@ -222,6 +224,76 @@ async def test_connect_error_is_reported():
     _request(transport, 2, "connect", {"peripheralId": 0})
     await _wait_for(lambda: _find(transport, message_id=2) is not None)
     assert _find(transport, message_id=2)["error"]["code"] == DEVICE_ERROR
+
+    transport.finish()
+    await task
+
+
+async def test_unexpected_disconnect_closes_session():
+    peripheral = make_microbit()
+    connection = FakeConnection()
+    backend = FakeBackend(peripherals=[peripheral], connection=connection)
+    transport = FakeTransport()
+    session = Session(transport, backend, scan_seconds=0.1)
+    task = asyncio.create_task(session.run())
+
+    _request(transport, 1, "discover", {"filters": [{"services": [0xF005]}]})
+    await _wait_for(lambda: _find(transport, message_id=1) is not None)
+    _request(transport, 2, "connect", {"peripheralId": 0})
+    await _wait_for(lambda: _find(transport, message_id=2) is not None)
+
+    connection.simulate_disconnect()
+    await asyncio.wait_for(task, 2.0)
+    assert transport.closed is True
+
+
+async def test_read_timeout_is_reported():
+    peripheral = make_microbit()
+    connection = FakeConnection(read_delay=2.0)
+    backend = FakeBackend(peripherals=[peripheral], connection=connection)
+    transport = FakeTransport()
+    session = Session(transport, backend, scan_seconds=0.1, operation_timeout=0.05)
+    task = asyncio.create_task(session.run())
+
+    _request(transport, 1, "discover", {"filters": [{"services": [0xF005]}]})
+    await _wait_for(lambda: _find(transport, message_id=1) is not None)
+    _request(transport, 2, "connect", {"peripheralId": 0})
+    await _wait_for(lambda: _find(transport, message_id=2) is not None)
+
+    _request(
+        transport,
+        3,
+        "read",
+        {"serviceId": 0xF005, "characteristicId": MICROBIT_RX},
+    )
+    await _wait_for(lambda: _find(transport, message_id=3) is not None)
+    assert _find(transport, message_id=3)["error"]["code"] == DEVICE_ERROR
+
+    transport.finish()
+    await task
+
+
+async def test_device_error_is_reported():
+    peripheral = make_microbit()
+    connection = FakeConnection(read_error=RuntimeError("boom"))
+    backend = FakeBackend(peripherals=[peripheral], connection=connection)
+    transport = FakeTransport()
+    session = Session(transport, backend, scan_seconds=0.1)
+    task = asyncio.create_task(session.run())
+
+    _request(transport, 1, "discover", {"filters": [{"services": [0xF005]}]})
+    await _wait_for(lambda: _find(transport, message_id=1) is not None)
+    _request(transport, 2, "connect", {"peripheralId": 0})
+    await _wait_for(lambda: _find(transport, message_id=2) is not None)
+
+    _request(
+        transport,
+        3,
+        "read",
+        {"serviceId": 0xF005, "characteristicId": MICROBIT_RX},
+    )
+    await _wait_for(lambda: _find(transport, message_id=3) is not None)
+    assert _find(transport, message_id=3)["error"]["code"] == DEVICE_ERROR
 
     transport.finish()
     await task

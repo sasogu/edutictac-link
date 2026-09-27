@@ -87,6 +87,7 @@ Cada connexió WebSocket crea una `Session` independent amb:
 | `EDUTICTAC_LINK_PORT` | `20111` | Port modern |
 | `EDUTICTAC_LINK_SCAN_SECONDS` | `10` | Duració de cada escaneig |
 | `EDUTICTAC_LINK_DISCOVER_TIMEOUT` | `15` | Reservat |
+| `EDUTICTAC_LINK_OPERATION_TIMEOUT` | `10` | Temps màxim per operació GATT |
 | `EDUTICTAC_LINK_ENFORCE_ORIGIN` | `1` | Valida la capçalera `Origin` |
 | `EDUTICTAC_LINK_ALLOW_MISSING_ORIGIN` | `1` | Permet clients natius sense origen |
 | `EDUTICTAC_LINK_ALLOW_ORIGINS` | llista | Orígens permesos, separats per comes |

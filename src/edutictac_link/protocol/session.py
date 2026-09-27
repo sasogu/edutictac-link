@@ -72,12 +72,14 @@ class Session:
         backend: BleBackend,
         *,
         scan_seconds: float = 10.0,
+        operation_timeout: float = 10.0,
         protocol_version: str = PROTOCOL_VERSION,
         logger: logging.Logger | None = None,
     ) -> None:
         self._transport = transport
         self._backend = backend
         self._scan_seconds = scan_seconds
+        self._operation_timeout = operation_timeout
         self._protocol_version = protocol_version
         self._log = logger or _LOGGER
 
@@ -89,11 +91,14 @@ class Session:
         self._filters: list[dict[str, Any]] = []
         self._peripherals: dict[int, Peripheral] = {}
         self._allowed_services: set[str] = set()
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._closing = False
 
     # -- cicle de vida ----------------------------------------------------
 
     async def run(self) -> None:
         """Bucle principal: rep missatges i manté el fil d'eixida."""
+        self._loop = asyncio.get_running_loop()
         self._sender_task = asyncio.create_task(self._sender_loop())
         try:
             while self._state is not SessionState.DONE:
@@ -112,6 +117,7 @@ class Session:
                 await self._sender_task
 
     async def _shutdown(self) -> None:
+        self._closing = True
         await self._cancel_discovery()
         if self._connection is not None:
             try:
@@ -273,7 +279,9 @@ class Session:
             raise JsonRpcError(INVALID_PARAMS, "peripheralId desconegut")
 
         try:
-            connection = await self._backend.connect(peripheral)
+            connection = await self._backend.connect(
+                peripheral, self._handle_disconnect
+            )
         except Exception as exc:
             self._log.error("No s'ha pogut connectar: %s", exc)
             raise JsonRpcError(
@@ -285,6 +293,20 @@ class Session:
         await self._cancel_discovery()
         self._log.info("Connectat a %s", peripheral.display_name or peripheral.id)
         return None
+
+    def _handle_disconnect(self) -> None:
+        """Callback del backend quan es perd la connexió (pot ser un altre fil)."""
+        loop = self._loop
+        if loop is not None:
+            loop.call_soon_threadsafe(self._on_device_disconnected)
+
+    def _on_device_disconnected(self) -> None:
+        if self._closing or self._state is not SessionState.CONNECTED:
+            return
+        self._log.info("S'ha perdut la connexió amb el perifèric")
+        self._state = SessionState.DONE
+        # Tancar el socket fa que el client detecte la pèrdua de connexió.
+        asyncio.ensure_future(self._transport.close())
 
     # -- operacions en estat connectat ------------------------------------
 
@@ -301,7 +323,9 @@ class Session:
 
         if method == "read":
             characteristic = self._require_characteristic(params)
-            data = await self._connection.read(service, characteristic)
+            data = await self._device_op(
+                self._connection.read(service, characteristic), "la lectura"
+            )
             result: dict[str, Any] = {
                 "message": base64.standard_b64encode(data).decode("ascii"),
                 "encoding": "base64",
@@ -316,8 +340,11 @@ class Session:
             with_response = params.get("withResponse")
             if with_response is not None:
                 with_response = bool(with_response)
-            return await self._connection.write(
-                service, characteristic, data, with_response
+            return await self._device_op(
+                self._connection.write(
+                    service, characteristic, data, with_response
+                ),
+                "l'escriptura",
             )
 
         if method == "startNotifications":
@@ -327,7 +354,10 @@ class Session:
 
         if method == "stopNotifications":
             characteristic = self._require_characteristic(params)
-            await self._connection.stop_notify(service, characteristic)
+            await self._device_op(
+                self._connection.stop_notify(service, characteristic),
+                "la desactivació de notificacions",
+            )
             return None
 
         raise JsonRpcError(METHOD_NOT_FOUND, f"Mètode desconegut: {method}")
@@ -349,7 +379,27 @@ class Session:
             )
             loop.call_soon_threadsafe(self._enqueue, notification)
 
-        await self._connection.start_notify(service, characteristic, callback)
+        await self._device_op(
+            self._connection.start_notify(service, characteristic, callback),
+            "l'activació de notificacions",
+        )
+
+    async def _device_op(self, awaitable: Any, what: str) -> Any:
+        """Executa una operació GATT amb temps d'espera i error uniforme."""
+        try:
+            return await asyncio.wait_for(
+                awaitable, timeout=self._operation_timeout
+            )
+        except asyncio.TimeoutError as exc:
+            raise JsonRpcError(
+                DEVICE_ERROR, f"S'ha esgotat el temps d'espera en {what}"
+            ) from exc
+        except JsonRpcError:
+            raise
+        except Exception as exc:
+            raise JsonRpcError(
+                DEVICE_ERROR, f"Error de dispositiu en {what}: {exc}"
+            ) from exc
 
     # -- utilitats --------------------------------------------------------
 

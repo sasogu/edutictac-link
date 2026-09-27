@@ -8,7 +8,12 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from edutictac_link.bluetooth.backend import BleBackend, BleConnection, NotifyCallback
+from edutictac_link.bluetooth.backend import (
+    BleBackend,
+    BleConnection,
+    DisconnectCallback,
+    NotifyCallback,
+)
 from edutictac_link.bluetooth.models import Advertisement, Peripheral
 
 _LOGGER = logging.getLogger("edutictac_link.bleak")
@@ -95,13 +100,21 @@ class BleakBackend(BleBackend):
         self._log.debug("Escaneig completat: %d perifèrics", len(peripherals))
         return peripherals
 
-    async def connect(self, peripheral: Peripheral) -> BleConnection:
+    async def connect(
+        self, peripheral: Peripheral, on_disconnect: DisconnectCallback | None = None
+    ) -> BleConnection:
         try:
             from bleak import BleakClient
         except ImportError as exc:  # pragma: no cover
             raise RuntimeError("Falta la biblioteca 'bleak'.") from exc
 
-        client = BleakClient(peripheral.id, timeout=20.0)
+        def _disconnected(_client: Any) -> None:
+            if on_disconnect is not None:
+                on_disconnect()
+
+        client = BleakClient(
+            peripheral.id, timeout=20.0, disconnected_callback=_disconnected
+        )
         await client.connect()
         self._client = client
         return BleakConnection(client, self._log)

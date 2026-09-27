@@ -73,6 +73,7 @@ class LinkServer:
             WsTransport(websocket),
             backend,
             scan_seconds=self.config.scan_seconds,
+            operation_timeout=self.config.operation_timeout,
             logger=self._log,
         )
         try:

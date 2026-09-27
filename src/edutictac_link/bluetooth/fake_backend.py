@@ -6,9 +6,15 @@ No forma part de l'execució de producció.
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
-from edutictac_link.bluetooth.backend import BleBackend, BleConnection, NotifyCallback
+from edutictac_link.bluetooth.backend import (
+    BleBackend,
+    BleConnection,
+    DisconnectCallback,
+    NotifyCallback,
+)
 from edutictac_link.bluetooth.models import Peripheral
 
 
@@ -19,14 +25,27 @@ def _key(characteristic: Any) -> str:
 class FakeConnection(BleConnection):
     """Connexió simulada amb valors i escriptures enregistrades."""
 
-    def __init__(self, values: dict[str, bytes] | None = None) -> None:
+    def __init__(
+        self,
+        values: dict[str, bytes] | None = None,
+        on_disconnect: DisconnectCallback | None = None,
+        read_delay: float = 0.0,
+        read_error: Exception | None = None,
+    ) -> None:
         self.values: dict[str, bytes] = dict(values or {})
         self.writes: list[tuple[str | None, Any, bytes, bool | None]] = []
         self.notify_callbacks: dict[str, NotifyCallback] = {}
         self.connected = True
+        self.on_disconnect = on_disconnect
+        self.read_delay = read_delay
+        self.read_error = read_error
 
     async def read(self, service: str | None, characteristic: Any) -> bytes:
         self._ensure_connected()
+        if self.read_delay:
+            await asyncio.sleep(self.read_delay)
+        if self.read_error is not None:
+            raise self.read_error
         return self.values.get(_key(characteristic), b"")
 
     async def write(
@@ -52,6 +71,14 @@ class FakeConnection(BleConnection):
     async def disconnect(self) -> None:
         self.connected = False
         self.notify_callbacks.clear()
+
+    def simulate_disconnect(self) -> None:
+        """Simula una pèrdua de connexió inesperada (per als tests)."""
+
+        self.connected = False
+        self.notify_callbacks.clear()
+        if self.on_disconnect is not None:
+            self.on_disconnect()
 
     def emit(self, characteristic: Any, data: bytes) -> None:
         """Simula una notificació del perifèric (per als tests)."""
@@ -86,6 +113,10 @@ class FakeBackend(BleBackend):
             raise self.scan_error
         return list(self.peripherals)
 
-    async def connect(self, peripheral: Peripheral) -> BleConnection:
+    async def connect(
+        self, peripheral: Peripheral, on_disconnect: DisconnectCallback | None = None
+    ) -> BleConnection:
         self.connected_peripheral = peripheral
+        if on_disconnect is not None:
+            self.connection.on_disconnect = on_disconnect
         return self.connection
